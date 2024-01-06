@@ -4,7 +4,7 @@ import traceback
 from dotenv import load_dotenv
 from langchain.llms import OpenAI
 from langchain.chains import LLMChain
-from flask import Flask, jsonify, request, session
+from flask import Flask, jsonify, request, session, render_template, send_from_directory
 from langchain.chat_models import ChatOpenAI
 from langchain.memory import ConversationBufferMemory, ConversationBufferWindowMemory
 from langchain.agents import ZeroShotAgent, AgentExecutor
@@ -152,6 +152,14 @@ def get_screening_questions():
       traceback.print_exc()
       return jsonify({'response': "I'm having trouble with that question. Please rephrase it to help me understand?"})
 
+
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+@app.route('/static/<path:filename>')
+def static_files(filename):
+    return send_from_directory('C:\\Users\\Azlan\\OneDrive\\Desktop\\HR-JD', filename)
 
 if __name__ == "__main__":
     app.run(host="127.0.0.1", port=8000, debug = True)
