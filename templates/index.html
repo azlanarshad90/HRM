@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Description Generator</title>
+    <link rel="stylesheet" href="../static/styles.css">
+    <script src="../static/script.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="input-container">
+            <label for="title">Title:</label>
+            <input type="text" id="title" name="title" required>
+
+            <label for="salary">Salary Range:</label>
+            <input type="text" id="salary" name="salary" required>
+
+            <label for="experience">Required Experience:</label>
+            <input type="text" id="experience" name="experience" required>
+
+            <label for="skills">Required Skills:</label>
+            <input type="text" id="skills" name="skills" required>
+
+            <label for="location">Location:</label>
+            <input type="text" id="location" name="location" required>
+
+            <label for="jobType">Job Type:</label>
+            <input type="text" id="jobType" name="jobType" required>
+
+            <button onclick="submitJobDetails()">Submit Job Details</button>
+        </div>
+
+        <div class="chat-container">
+            <div class="user-input">
+                <label for="userQuery">User Query:</label>
+                <input type="text" id="userQuery" name="userQuery" required>
+                <button onclick="submitUserQuery()">Submit</button>
+            </div>
+
+            <div class="agent-response">
+                <label for="agentResponse">AI Agent Response:</label>
+                <textarea id="agentResponse" readonly></textarea>
+            </div>
+
+            <button onclick="saveAndProceed()">Save and Proceed</button>
+            <button onclick="approveScreeningQuestions()">Approve Screening Questions</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
