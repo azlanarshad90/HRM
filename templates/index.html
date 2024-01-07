@@ -4,28 +4,36 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Job Description Generator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../static/styles.css">
 </head>
 <body>
     <div class="container">
-        <div class="input-container">
+        <div class="input-container" id="inputjobdetails" style="display:block;">
+            
             <label for="title">Title:</label>
             <input type="text" id="title" name="title" required>
+            
 
             <label for="salary">Salary Range:</label>
             <input type="text" id="salary" name="salary" required>
+            <br></br>
 
             <label for="experience">Required Experience:</label>
             <input type="text" id="experience" name="experience" required>
+            
 
             <label for="skills">Required Skills:</label>
             <input type="text" id="skills" name="skills" required>
+            <br></br>
 
             <label for="location">Location:</label>
             <input type="text" id="location" name="location" required>
+            
 
             <label for="jobType">Job Type:</label>
             <input type="text" id="jobType" name="jobType" required>
+            <br></br>
 
             <button onclick="submitJobDetails()">Submit Job Details</button>
         </div>
@@ -33,14 +41,15 @@
         <div class="chat-container">
             <div class="chat-box" id="chatBox"></div>
 
-            <div class="user-input">
-                <label for="userQuery">User Query:</label>
-                <input type="text" id="userQuery" name="userQuery" required>
-                <button onclick="submitUserQuery()">Submit</button>
+            <div class="user-input" id="userInputSection" style="display:none;">
+              <label for="userQuery">User Query:</label>
+              <input type="text" id="userQuery" name="userQuery" required disabled>
+              <button onclick="submitUserQuery()" id="submituserquerybutton">Submit</button>
             </div>
 
-            <button onclick="saveAndProceed()">Approve Job Description</button>
-            <button onclick="approveScreeningQuestions()">Approve Screening Questions</button>
+            <button onclick="saveAndProceed()" id="apiproceed" style="display:none;">Approve Job Description</button>
+            <button onclick="approveScreeningQuestions()" id="screenques" style="display:none;">Approve Screening Questions</button>
+            <button onclick="apiScreeningQuestions()" id="apiroutescreen" style="display:none;">Create Screening Questions</button>
         </div>
     </div>
 

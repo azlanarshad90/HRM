@@ -98,16 +98,18 @@ def get_job_description():
                 response = response.replace("Could not parse LLM output: `AI:", '')
                 response = response.replace("`", '')
             final_jd = response
+            print("Memory without approval: ", memory)
             response_text = jsonify({'response': response})
             return response_text
         elif approved_jd:
             print("Final Approved JD is:\n", final_jd)
             session["final_jd"] = final_jd
-            memory = ""
+            # memory = ""
             response_text = jsonify({'response': final_jd, 'next_route': '/get-screening-questions'})
             print("In JD route: ", memory)
             return response_text
         else:
+            # Handle case where userInput and approved_jd are both empty or False
             return jsonify({'response': "Invalid request. Please provide userInput or set approved_jd to True."})
     except Exception as e:
         print("Error getting chat response:", e)
@@ -123,10 +125,11 @@ def get_screening_questions():
         session.clear()
         data = request.get_json()
         userInput = data.get('userInput', '')
-        previousResponse = data.get('previousResponse', '')
+        previousResponse = data.get('previousResponse', '')  # Get previous response
         approved_screen_ques = data.get('approved_screen_ques', False)
         response = ''
-
+        
+        # Use previous response in the conversation
         main_prompt = f"""
             Answer the user's input given in triple backticks and develop at least 10 screening questions from the given Job Description:
             1. Job Description: {previousResponse}
@@ -145,6 +148,7 @@ def get_screening_questions():
             response = response.replace("Could not parse LLM output: `AI:", '')
             response = response.replace("`", '')
         final_questions = response
+        print("Memory in screen route: ", memory)
         response_text = jsonify({'response': response})
         return response_text
     except Exception as e:
