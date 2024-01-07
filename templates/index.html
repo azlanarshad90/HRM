@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Job Description Generator</title>
     <link rel="stylesheet" href="../static/styles.css">
-    <script src="../static/script.js"></script>
 </head>
 <body>
     <div class="container">
@@ -32,22 +31,19 @@
         </div>
 
         <div class="chat-container">
+            <div class="chat-box" id="chatBox"></div>
+
             <div class="user-input">
                 <label for="userQuery">User Query:</label>
                 <input type="text" id="userQuery" name="userQuery" required>
                 <button onclick="submitUserQuery()">Submit</button>
             </div>
 
-            <div class="agent-response">
-                <label for="agentResponse">AI Agent Response:</label>
-                <textarea id="agentResponse" readonly></textarea>
-            </div>
-
-            <button onclick="saveAndProceed()">Save and Proceed</button>
+            <button onclick="saveAndProceed()">Approve Job Description</button>
             <button onclick="approveScreeningQuestions()">Approve Screening Questions</button>
         </div>
     </div>
 
-    <script src="script.js"></script>
+    <script src="../static/script.js"></script>
 </body>
 </html>

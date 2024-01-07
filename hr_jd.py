@@ -59,77 +59,85 @@ final_questions = ''
 # Similarly, after approving the Job Description, show the user ten screening questions accroding to that Job Description, and when the user approves the screening question, you must thanks at the end.
 @app.route('/get-jd', methods=['POST'])
 def get_job_description():
-  global final_jd, memory
-  try:
-      data = request.get_json()
-      userInput = data.get('userInput', '')
-      approved_jd = data.get('approved_jd', False)
-      title = data.get('Title', '')
-      salary = data.get('Salary_Range', '')
-      experience = data.get('Required_Experience', '')
-      skills = data.get('Required_Skills', '')
-      location = data.get('Location', '')
-      job_type = data.get('Job_Type', '')
-      response = ''
-      if userInput != "":
-        main_prompt = f"""Answer the user's input given in triple backticks and Develop a detailed job description from your creativity for the information given to you:
-                        1. Job Title: {title}
-                        2. Salary Range: {salary}
-                        3. Required Experience: {experience}
-                        4. Required Skills: {skills}
-                        5. Location: {location}
-                        6. Onsite or Remote: {job_type}
-                        If user starts the conversation, then you must greet the user and ask them if they need anything. Access these input parameters when the user need to develop a job description.
-                        Extract these parameters from the chat history and user input.
-                        If you do not find these six parameters or any of the parameter is missing, then query the user for the missing parameters.
-                        Once you have all six parameters, proceed to develop the job description with maximum detail according to your ability.
-                        If user required any updates or changes, then make those changes and show the complete updated job description to user.
-                        Only return the job description without any other extra words.
-                        Note: Develop as more detailed job description as you can and showcase your creativity.
-                        ```{userInput}```
-                        """
-        try:
-            response = agent_chain.run(main_prompt)
-        except ValueError as e:
-            response = str(e)
-            if not response.startswith("Could not parse LLM output: `"):
-                raise e
-            response = response.replace("Could not parse LLM output: `AI:", '')
-            response = response.replace("`", '')
-        final_jd = response
-        response_text = jsonify({'response': response})
-        return response_text
-      elif approved_jd == "True":
-        print("Final Approved JD is:\n", final_jd)
-        session["final_jd"]=final_jd
-        memory = ""
-        response_text = jsonify({'response': final_jd})
-        print("In JD route: ", memory)
-        return response_text
-  except Exception as e:
-      print("Error getting chat response:", e)
-      traceback.print_exc()
-      return jsonify({'response': "I'm having trouble with that question. Please rephrase it to help me understand?"})
+    global final_jd, memory
+    try:
+        data = request.get_json()
+        userInput = data.get('userInput', '')
+        approved_jd = data.get('approved_jd', False)
+        title = data.get('Title', '')
+        salary = data.get('Salary_Range', '')
+        experience = data.get('Required_Experience', '')
+        skills = data.get('Required_Skills', '')
+        location = data.get('Location', '')
+        job_type = data.get('Job_Type', '')
+        response = ''
+        if userInput != "":
+            main_prompt = f"""
+                Answer the user's input given in triple backticks and Develop a detailed job description from your creativity for the information given to you:
+                1. Job Title: {title}
+                2. Salary Range: {salary}
+                3. Required Experience: {experience}
+                4. Required Skills: {skills}
+                5. Location: {location}
+                6. Onsite or Remote: {job_type}
+                If the user starts the conversation, then you must greet the user and ask them if they need anything. Access these input parameters when the user needs to develop a job description.
+                Extract these parameters from the chat history and user input.
+                If you do not find these six parameters or any of the parameters are missing, then query the user for the missing parameters.
+                Once you have all six parameters, proceed to develop the job description with maximum detail according to your ability.
+                If the user requires any updates or changes, then make those changes and show the complete updated job description to the user.
+                Only return the job description without any other extra words.
+                Note: Develop as a more detailed job description as you can and showcase your creativity.
+                ```{userInput}```
+            """
+            try:
+                response = agent_chain.run(main_prompt)
+            except ValueError as e:
+                response = str(e)
+                if not response.startswith("Could not parse LLM output: `"):
+                    raise e
+                response = response.replace("Could not parse LLM output: `AI:", '')
+                response = response.replace("`", '')
+            final_jd = response
+            response_text = jsonify({'response': response})
+            return response_text
+        elif approved_jd:
+            print("Final Approved JD is:\n", final_jd)
+            session["final_jd"] = final_jd
+            memory = ""
+            response_text = jsonify({'response': final_jd, 'next_route': '/get-screening-questions'})
+            print("In JD route: ", memory)
+            return response_text
+        else:
+            # Handle case where userInput and approved_jd are both empty or False
+            return jsonify({'response': "Invalid request. Please provide userInput or set approved_jd to True."})
+    except Exception as e:
+        print("Error getting chat response:", e)
+        traceback.print_exc()
+        return jsonify({'response': "I'm having trouble with that question. Please rephrase it to help me understand?"})
 
 
 @app.route('/get-screening-questions', methods=['POST'])
 def get_screening_questions():
-  global final_questions, memory
-  try:
-      final_jd = session.get("final_jd",None)
-      session.clear()
-      data = request.get_json()
-      userInput = data.get('userInput', '')
-      approved_screen_ques = data.get('approved_screen_ques', False)
-      response = ''
-      if userInput != "":
-        main_prompt = f"""Answer the user's input given in triple backticks and develop at least 10 screening questions from the given Job Description:
-                        1. Job Description: {final_jd}
-                        Extract the job description from the chat history and user input.
-                        If user required any updates or changes, then make those changes and show the complete updated screening question to user.
-                        Only return the all screening question in numbers without any other extra words.
-                        ```{userInput}```
-                        """
+    global final_questions, memory
+    try:
+        final_jd = session.get("final_jd", None)
+        session.clear()
+        data = request.get_json()
+        userInput = data.get('userInput', '')
+        previousResponse = data.get('previousResponse', '')  # Get previous response
+        approved_screen_ques = data.get('approved_screen_ques', False)
+        response = ''
+        
+        # Use previous response in the conversation
+        main_prompt = f"""
+            Answer the user's input given in triple backticks and develop at least 10 screening questions from the given Job Description:
+            1. Job Description: {previousResponse}
+            Extract the job description from the chat history and user input.
+            If user required any updates or changes, then make those changes and show the complete updated screening question to user.
+            Only return the all screening question in numbers without any other extra words.
+            ```{userInput}```
+        """
+
         try:
             response = agent_chain.run(main_prompt)
         except ValueError as e:
@@ -141,16 +149,10 @@ def get_screening_questions():
         final_questions = response
         response_text = jsonify({'response': response})
         return response_text
-      elif approved_screen_ques == "True":
-        print("Final Approved screening questions are:\n", final_questions)
-        memory = ""
-        response_text = jsonify({'response': final_questions})
-        print("In screen route: ", memory)
-        return response_text
-  except Exception as e:
-      print("Error getting chat response:", e)
-      traceback.print_exc()
-      return jsonify({'response': "I'm having trouble with that question. Please rephrase it to help me understand?"})
+    except Exception as e:
+        print("Error getting chat response:", e)
+        traceback.print_exc()
+        return jsonify({'response': "I'm having trouble with that question. Please rephrase it to help me understand?"})
 
 
 @app.route('/')
