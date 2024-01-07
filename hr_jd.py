@@ -108,7 +108,6 @@ def get_job_description():
             print("In JD route: ", memory)
             return response_text
         else:
-            # Handle case where userInput and approved_jd are both empty or False
             return jsonify({'response': "Invalid request. Please provide userInput or set approved_jd to True."})
     except Exception as e:
         print("Error getting chat response:", e)
@@ -124,11 +123,10 @@ def get_screening_questions():
         session.clear()
         data = request.get_json()
         userInput = data.get('userInput', '')
-        previousResponse = data.get('previousResponse', '')  # Get previous response
+        previousResponse = data.get('previousResponse', '')
         approved_screen_ques = data.get('approved_screen_ques', False)
         response = ''
-        
-        # Use previous response in the conversation
+
         main_prompt = f"""
             Answer the user's input given in triple backticks and develop at least 10 screening questions from the given Job Description:
             1. Job Description: {previousResponse}

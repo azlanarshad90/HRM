@@ -51,6 +51,7 @@ body {
 
 .agent-message, .user-message {
     margin-bottom: 10px;
+    font-size: 0.85rem;
     padding: 10px;
     border-radius: 8px;
     word-wrap: break-word;
