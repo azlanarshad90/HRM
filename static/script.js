@@ -173,9 +173,10 @@ function approveScreeningQuestions() {
     alert('Kindly refresh the browser to start a new session.');
 }
 
+
 function apiScreeningQuestions() {
     userInput = "Create screening questions for the approved job description."
-    updateChatBox('<div class="agent-message">Pleasse wait, the agent is creating some screening questions...' + '</div>');
+    updateChatBox('<div class="agent-message">Please wait, the agent is creating some screening questions...' + '</div>');
     document.getElementById("apiroutescreen").disabled = true;
     document.getElementById("apiroutescreen").style.display = "none";
     fetch('/get-screening-questions', {
