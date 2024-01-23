@@ -17,7 +17,6 @@ from langchain.agents import AgentType, initialize_agent, load_tools
 app = Flask(__name__)
 
 app.secret_key = 'hr_jd'
-openai.api_key = ""
 load_dotenv()
 
 openai.api_key = os.environ["OPENAI_API_KEY"]
@@ -49,16 +48,7 @@ llm = ChatOpenAI(
 tools = load_tools(["llm-math"], llm=llm)
 prefix = """You are an AI assistant who helps users in development of job description. The job description is finalized by confirming all the important information. Only finalize the job description when the user tells you to. Never access the tools."""
 suffix = """Begin!"{chat_history}Question: {input}{agent_scratchpad}"""
-# memory = ConversationBufferMemory(memory_key="chat_history")
 conversation_memory = ConversationBufferWindowMemory(memory_key="chat_history", k=1, chat_memory=history)
-# redis_memory = RedisChatMessageHistory(session_id="user_session")
-# memory = [conversation_memory, redis_memory]
-# memory.save_context({"input": "hi"}, {"output": "Hi, how can I help you with your new job opening?"})
-# memory.save_context({"input": "Write me a job description for an Engineer"}, {"output": "Sure, I would love to. Can you please provide me with more details of this new job opening as an Engineer."})
-# memory.save_context({"input": "We need an Electrical Engineer with 3 years of experience"}, {"output": "Great, I see you need an Electrical Engineer with 3 years of experience. But for a job description, I need more details from you. Can you please provide me the details like, Main Responsibilities, Salary Range, Required Qualifications or any other things you would like to add?"})
-# memory.save_context({"input": "The minimum qualification must be Bachelors Degree and salary will range from $3000 to $4000"}, {"output": "I got your requirements. What about the main responsibilities or anything that you want me to add in the job description?"})
-# memory.save_context({"input": "Tell me a joke"}, {"output": "I'm sorry. As an HR assistant I can only create Job Description for you. Do you want me to create one for you?"})
-# memory.load_memory_variables({})
 prompt = ZeroShotAgent.create_prompt(
     tools=tools,
     prefix=prefix,
@@ -70,15 +60,9 @@ agent = ZeroShotAgent(llm_chain=llm_chain, tools=tools, verbose=True, handle_par
 agent_chain = AgentExecutor.from_agent_and_tools(
     agent=agent, tools=tools, verbose=True, memory=conversation_memory, max_execution_time=2, early_stopping_method="generate", handle_parsing_errors=True
     )
-# title = "AI developer"
-# salary = "$4k to $5k"
-# experience = "Minimum 5 years"
-# skills = "NLP, Python, Django"
-# location = "Lahore"
-# job_type = "Remote"
 final_jd = ''
 final_questions = ''
-# Similarly, after approving the Job Description, show the user ten screening questions accroding to that Job Description, and when the user approves the screening question, you must thanks at the end.
+
 @app.route('/get-jd', methods=['POST'])
 def get_job_description():
     global final_jd, memory
@@ -120,7 +104,7 @@ def get_job_description():
                 response = response.replace("Could not parse LLM output: `AI:", '')
                 response = response.replace("`", '')
             final_jd = response
-            print("Memory without approval: /n-------------------------", memory)
+            # print("Memory without approval: /n-------------------------", memory)
             response_text = jsonify({'response': response})
             return response_text
         elif approved_jd:
@@ -128,7 +112,7 @@ def get_job_description():
             session["final_jd"] = final_jd
             # memory = ""
             response_text = jsonify({'response': final_jd, 'next_route': '/get-screening-questions'})
-            print("After JD Approval: /n---------------------------------", memory)
+            # print("After JD Approval: /n---------------------------------", memory)
             return response_text
         else:
             # Handle case where userInput and approved_jd are both empty or False
@@ -171,7 +155,7 @@ def get_screening_questions():
             response = response.replace("Could not parse LLM output: `AI:", '')
             response = response.replace("`", '')
         final_questions = response
-        print("Memory in screen route: /n---------------------", memory)
+        # print("Memory in screen route: /n---------------------", memory)
         response_text = jsonify({'response': response})
         return response_text
     except Exception as e:
