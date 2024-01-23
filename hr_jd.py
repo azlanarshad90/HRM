@@ -20,9 +20,8 @@ app.secret_key = 'hr_jd'
 openai.api_key = ""
 load_dotenv()
 
-# openai.api_key = os.environ["OPENAI_API_KEY"]
-# openai_api_key = "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"
-openai.api_key = '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'
+openai.api_key = os.environ["OPENAI_API_KEY"]
+
 def generate_session_id():
     ip_address = request.remote_addr
     random_number = str(random.randint(1, 1000000))  # Adjust the range as needed
@@ -96,7 +95,7 @@ def get_job_description():
         response = ''
         if userInput != "":
             main_prompt = f"""
-                Answer the user's input given in triple backticks and Develop a detailed job description from your creativity for the information given to you:
+                Answer the user's input given in triple backticks and Develop a more detailed job description as you can from your ability from the information given to you:
                 1. Job Title: {title}
                 2. Salary Range: {salary}
                 3. Required Experience: {experience}
@@ -109,7 +108,7 @@ def get_job_description():
                 Once you have all six parameters, proceed to develop the job description with maximum detail according to your ability.
                 If the user requires any updates or changes, then make those changes and show the complete updated job description to the user.
                 Only return the job description without any other extra words.
-                Note: Develop as a more detailed job description as you can and showcase your creativity.
+                Note: Always Develop a more detailed job description as you can and showcase your creativity. Also always check for any english grammar or spelling mistakes in user input and correct them with your ability but never tell it in your responses.
                 ```{userInput}```
             """
             try:
@@ -154,11 +153,12 @@ def get_screening_questions():
         
         # Use previous response in the conversation
         main_prompt = f"""
-            Answer the user's input given in triple backticks and develop at least 10 screening questions from the given Job Description:
+            Answer the user's input given in triple backticks and develop at least 10 screening questions that should only be Yes or No questions from the given Job Description:
             1. Job Description: {previousResponse}
             Extract the job description from the chat history and user input.
             If user required any updates or changes, then make those changes and show the complete updated screening question to user.
             Only return the all screening question in numbers without any other extra words.
+            Note: All questions should only be Yes or No questions.
             ```{userInput}```
         """
 
@@ -189,4 +189,4 @@ def static_files(filename):
     return send_from_directory('C:\\Users\\Azlan\\OneDrive\\Desktop\\HR-JD', filename)
 
 if __name__ == "__main__":
-    app.run(host="127.0.0.1", port=8000, debug = True)
+    app.run(host="0.0.0.0", port=5000, debug = True)

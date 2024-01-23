@@ -39,9 +39,6 @@ function submitJobDetails() {
     document.getElementById("submituserquerybutton").disabled = false;
     document.getElementById("submituserquerybutton").style.display = "block";
 
-    // document.getElementById("screenques").disabled = false;
-    // document.getElementById("screenques").style.display = "block";
-
     jobDetailsSubmitted = true;
 }
 
@@ -140,23 +137,7 @@ function saveAndProceed() {
 }
 
 function approveScreeningQuestions() {
-    // fetch('/get-screening-questions', {
-    //     method: 'POST',
-    //     headers: {
-    //         'Content-Type': 'application/json',
-    //     },
-    //     body: JSON.stringify({
-    //         userInput: '',
-    //         approved_screen_ques: true,
-    //     }),
-    // })
-    // .then(response => response.json())
-    // .then(data => {
-    //     updateChatBox('<div class="agent-message">' + data.response + '</div>');
-    // })
-    // .catch(error => {
-    //     console.error('Error:', error);
-    // });
+
     updateChatBox('<div class="agent-message">You are all done' + '</div>');
     document.getElementById("inputjobdetails").disabled = true;
     document.getElementById("inputjobdetails").style.display = "none";
@@ -176,7 +157,7 @@ function approveScreeningQuestions() {
 
 function apiScreeningQuestions() {
     userInput = "Create screening questions for the approved job description."
-    updateChatBox('<div class="agent-message">Please wait, the agent is creating some screening questions...' + '</div>');
+    updateChatBox('<div class="agent-message">Pleasse wait, the agent is creating some screening questions...' + '</div>');
     document.getElementById("apiroutescreen").disabled = true;
     document.getElementById("apiroutescreen").style.display = "none";
     fetch('/get-screening-questions', {
