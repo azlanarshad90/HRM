@@ -8,11 +8,10 @@ from langchain.llms import OpenAI
 from langchain.chains import LLMChain
 from flask import Flask, jsonify, request, session, render_template, send_from_directory
 from langchain.chat_models import ChatOpenAI
-from langchain.memory import ConversationBufferMemory, ConversationBufferWindowMemory
-# from langchain_community.chat_message_histories.redis import RedisChatMessageHistory
+from langchain.memory import ConversationBufferWindowMemory
 from langchain.memory import RedisChatMessageHistory
 from langchain.agents import ZeroShotAgent, AgentExecutor
-from langchain.agents import AgentType, initialize_agent, load_tools
+from langchain.agents import load_tools
 
 app = Flask(__name__)
 
@@ -23,7 +22,7 @@ openai.api_key = os.environ["OPENAI_API_KEY"]
 
 def generate_session_id():
     ip_address = request.remote_addr
-    random_number = str(random.randint(1, 1000000))  # Adjust the range as needed
+    random_number = str(random.randint(1, 1000000))
     unique_string = f"{ip_address}-{random_number}"
     session_id = hashlib.sha256(unique_string.encode()).hexdigest()
     return session_id
@@ -35,11 +34,10 @@ REDIS_PORT = os.environ["REDIS_PORT"]
 REDIS_DB = os.environ["REDIS_DB"]
 REDIS_URL = f"redis://{REDIS_USERNAME}:{REDIS_PASSWORD}@{REDIS_HOST}:{REDIS_PORT}/{REDIS_DB}"
 history = RedisChatMessageHistory(url=REDIS_URL, session_id=session_id, key_prefix='HR_Tool_TEST')
-print("session_id: ----------------------\n", session_id)
 
 memory = ""
 llm = ChatOpenAI(
-    temperature=1.0,
+    temperature=1.0,  #For more creativeness
     openai_api_key=openai.api_key,
     model_name="gpt-4",
     verbose=True    
@@ -104,18 +102,14 @@ def get_job_description():
                 response = response.replace("Could not parse LLM output: `AI:", '')
                 response = response.replace("`", '')
             final_jd = response
-            # print("Memory without approval: /n-------------------------", memory)
             response_text = jsonify({'response': response})
             return response_text
         elif approved_jd:
             print("Final Approved JD is:\n", final_jd)
             session["final_jd"] = final_jd
-            # memory = ""
             response_text = jsonify({'response': final_jd, 'next_route': '/get-screening-questions'})
-            # print("After JD Approval: /n---------------------------------", memory)
             return response_text
         else:
-            # Handle case where userInput and approved_jd are both empty or False
             return jsonify({'response': "Invalid request. Please provide userInput or set approved_jd to True."})
     except Exception as e:
         print("Error getting chat response:", e)
@@ -135,7 +129,6 @@ def get_screening_questions():
         approved_screen_ques = data.get('approved_screen_ques', False)
         response = ''
         
-        # Use previous response in the conversation
         main_prompt = f"""
             Answer the user's input given in triple backticks and develop at least 10 screening questions that should only be Yes or No questions from the given Job Description:
             1. Job Description: {previousResponse}
@@ -155,7 +148,6 @@ def get_screening_questions():
             response = response.replace("Could not parse LLM output: `AI:", '')
             response = response.replace("`", '')
         final_questions = response
-        # print("Memory in screen route: /n---------------------", memory)
         response_text = jsonify({'response': response})
         return response_text
     except Exception as e:

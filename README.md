@@ -1,2 +1,2 @@
 # HRM
-HRM tool for JD and SQ from AI agent
+HRM tool for creating Job Description and Screening Qusetions from AI agent
